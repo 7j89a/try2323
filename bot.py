@@ -16,7 +16,7 @@ api_hash = "d169162c1bcf092a6773e685c62c3894"  # استبدل بـ API Hash ال
 bot_token = "7701589300:AAG-64FpYOaXkH1OnTXgD08Fk84j4A3dwp4"  # استبدل بـ توكن البوت الخاص بك
 
 # تشغيل البوت
-app_bot = Client("downloader_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+app = Client("downloader_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 # تشغيل Flask
 app_flask = Flask(__name__)
