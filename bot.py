@@ -25,8 +25,6 @@ app_flask = Flask(__name__)
 def home():
     return "🚀 البوت يعمل بنجاح مع Flask و Pyrogram!"
 
-# مسار الصورة المصغّرة
-thumbnail_path = r"/data/photo.jpg"  # مسار الصورة المصغّرة
 
 # متغيرات عالمية
 user_headers = {}
@@ -45,7 +43,7 @@ async def safe_edit_message(message, text):
         await message.edit(text)
 
 # دالة لإنشاء شريط التقدم
-def generate_progress_bar(percent, total_bars=20, symbol="⭐", completed_symbol="✅"):
+def generate_progress_bar(percent, total_bars=10, symbol="🚀", completed_symbol="✅"):
     """إنشاء شريط تقدم دقيق يتأكد من اكتمال الرموز عند 100%"""
     completed = int(percent / (100 / total_bars))
     remaining = total_bars - completed
@@ -240,7 +238,6 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
         width=640,
         height=360,
         duration=duration,
-        thumb=thumbnail_path,
         caption=caption,
         supports_streaming=True,
         progress=progress_callback
