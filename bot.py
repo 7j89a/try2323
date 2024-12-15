@@ -88,21 +88,21 @@ async def start(client, message):
     )
 
 # استقبال أوامر الأزرار
-@app_bot.on_callback_query(filters.regex("user_agent"))
+@app.on_callback_query(filters.regex("user_agent"))
 async def set_user_agent(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_user_agent"
     await callback_query.message.reply_text("🚀 أرسل الـ User-Agent الذي ترغب في استخدامه:")
     await callback_query.answer()
 
-@app_bot.on_callback_query(filters.regex("referer"))
+@app.on_callback_query(filters.regex("referer"))
 async def set_referer(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_referer"
     await callback_query.message.reply_text("🔗 أرسل الـ Referer الذي ترغب في استخدامه:")
     await callback_query.answer()
 
-@app_bot.on_callback_query(filters.regex("set_video_name"))
+@app.on_callback_query(filters.regex("set_video_name"))
 async def set_video_name(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_video_name"
