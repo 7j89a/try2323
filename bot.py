@@ -8,6 +8,7 @@ import subprocess
 import os
 import time
 import re
+from threading import Thread
 
 # بيانات الاتصال بالبوت
 api_id = 20944746  # استبدل بـ API ID الخاص بك
