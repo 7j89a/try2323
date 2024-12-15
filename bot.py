@@ -1,4 +1,3 @@
-import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
@@ -7,8 +6,9 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 import subprocess
 import os
 import time
-import re
-from threading import Thread
+import asyncio
+import threading
+import re 
 
 # بيانات الاتصال بالبوت
 api_id = 20944746  # استبدل بـ API ID الخاص بك
