@@ -244,14 +244,11 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
     )
 
 # تشغيل الخوادم بشكل غير متزامن
-async def main():
-    # تشغيل Flask في الخيط
-    flask_thread = Thread(target=app_flask.run, kwargs={"host": "0.0.0.0", "port": 8080})
-    flask_thread.daemon = True
-    flask_thread.start()
+def run_flask():
+    app_flask.run(host="0.0.0.0", port=8080)
 
-    # تشغيل البوت
-    await app.start()
-
+# بدء تشغيل البوت وخادم Flask
 if __name__ == "__main__":
-    asyncio.run(main())
+    threading.Thread(target=run_flask).start()
+    print("🚀 بدء تشغيل البوت وخادم Flask...")
+    app.run()
