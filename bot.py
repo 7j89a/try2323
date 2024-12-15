@@ -88,21 +88,21 @@ async def start(client, message):
     )
 
 # استقبال أوامر الأزرار
-@app.on_callback_query(filters.regex("user_agent"))
+@app_bot.on_callback_query(filters.regex("user_agent"))
 async def set_user_agent(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_user_agent"
     await callback_query.message.reply_text("🚀 أرسل الـ User-Agent الذي ترغب في استخدامه:")
     await callback_query.answer()
 
-@app.on_callback_query(filters.regex("referer"))
+@app_bot.on_callback_query(filters.regex("referer"))
 async def set_referer(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_referer"
     await callback_query.message.reply_text("🔗 أرسل الـ Referer الذي ترغب في استخدامه:")
     await callback_query.answer()
 
-@app.on_callback_query(filters.regex("set_video_name"))
+@app_bot.on_callback_query(filters.regex("set_video_name"))
 async def set_video_name(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_video_name"
@@ -228,10 +228,8 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
                 f"📤 **Uploading...**\n\n"
                 f"{progress_bar}\n\n"
                 f"✅ **Completed:** {current / (1024*1024):.2f} MB / {total_size / (1024*1024):.2f} MB\n"
-                f"⚡ **Speed:** {speed:.2f} MB/s\n"
-                f"⏳ **Time left:** {duration - elapsed_time:.2f}s"
+                f"⚡ **Speed:** {speed:.2f} MB/s"
             )
-
             await safe_edit_message(progress_message, message_text)
             last_percent = percent
             last_update_time = current_time
@@ -239,9 +237,20 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
     await client.send_video(
         chat_id=progress_message.chat.id,
         video=file_path,
+        width=640,
+        height=360,
+        duration=duration,
+        thumb=thumbnail_path,
         caption=caption,
+        supports_streaming=True,
         progress=progress_callback
     )
+    await safe_edit_message(progress_message, "✅ **تم اكتمال التحميل وإرسال الفيديو بنجاح!**")
+
+    # حذف الفيديو بعد رفعه
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"تم حذف الملف: {file_path}")
 
 # تشغيل الخوادم بشكل غير متزامن
 def run_flask():
