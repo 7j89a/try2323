@@ -1,3 +1,4 @@
+import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
@@ -6,8 +7,6 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 import subprocess
 import os
 import time
-import asyncio
-import threading
 import re
 
 # بيانات الاتصال بالبوت
@@ -228,8 +227,10 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
                 f"📤 **Uploading...**\n\n"
                 f"{progress_bar}\n\n"
                 f"✅ **Completed:** {current / (1024*1024):.2f} MB / {total_size / (1024*1024):.2f} MB\n"
-                f"⚡ **Speed:** {speed:.2f} MB/s"
+                f"⚡ **Speed:** {speed:.2f} MB/s\n"
+                f"⏳ **Time left:** {duration - elapsed_time:.2f}s"
             )
+
             await safe_edit_message(progress_message, message_text)
             last_percent = percent
             last_update_time = current_time
@@ -237,27 +238,20 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
     await client.send_video(
         chat_id=progress_message.chat.id,
         video=file_path,
-        width=640,
-        height=360,
-        duration=duration,
-        thumb=thumbnail_path,
         caption=caption,
-        supports_streaming=True,
         progress=progress_callback
     )
-    await safe_edit_message(progress_message, "✅ **تم اكتمال التحميل وإرسال الفيديو بنجاح!**")
 
-    # حذف الفيديو بعد رفعه
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print(f"تم حذف الملف: {file_path}")
+# تشغيل الخوادم بشكل غير متزامن
+async def main():
+    # تشغيل Flask
+    from threading import Thread
+    flask_thread = Thread(target=app_flask.run, kwargs={"host": "0.0.0.0", "port": 5000})
+    flask_thread.daemon = True
+    flask_thread.start()
 
-# تشغيل Flask في Thread منفصل
-def run_flask():
-    app_flask.run(host="0.0.0.0", port=8080)
+    # تشغيل البوت
+    await app.start()
 
-# بدء تشغيل البوت وخادم Flask
 if __name__ == "__main__":
-    threading.Thread(target=run_flask).start()
-    print("🚀 بدء تشغيل البوت وخادم Flask...")
-    app_bot.run()
+    asyncio.run(main())
