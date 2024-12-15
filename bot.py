@@ -238,6 +238,7 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
         width=640,
         height=360,
         duration=duration,
+        thumb=thumbnail_path,
         caption=caption,
         supports_streaming=True,
         progress=progress_callback
