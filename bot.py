@@ -24,7 +24,7 @@ app_flask = Flask(__name__)
 @app_flask.route("/")
 def home():
     return "🚀 البوت يعمل بنجاح مع Flask و Pyrogram!"
-
+thumbnail_path = "/app/data/photo.jpg"  # مسار الصورة المصغّرة
 
 # متغيرات عالمية
 user_headers = {}
