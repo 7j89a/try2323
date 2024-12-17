@@ -2,4 +2,5 @@ pyrogram
 tgcrypto
 flask
 moviepy
+aiohttp
 yt-dlp
