@@ -1,13 +1,12 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
-from flask import Flask
+from aiohttp import web
 from moviepy.video.io.VideoFileClip import VideoFileClip
+import asyncio
 import subprocess
 import os
 import time
-import asyncio
-import threading
 import re
 
 # بيانات الاتصال بالبوت
@@ -16,14 +15,14 @@ api_hash = "d169162c1bcf092a6773e685c62c3894"  # استبدل بـ API Hash ال
 bot_token = "7701589300:AAG-64FpYOaXkH1OnTXgD08Fk84j4A3dwp4"  # استبدل بـ توكن البوت الخاص بك
 
 # تشغيل البوت
-app = Client("dwnloader_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+app = Client("dwnloadersss_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
-# تشغيل Flask
-app_flask = Flask(__name__)
+# إعداد aiohttp بديل لـ Flask
+async def handle_home(request):
+    return web.Response(text="🚀 البوت يعمل بنجاح مع aiohttp و Pyrogram!")
 
-@app_flask.route("/")
-def home():
-    return "🚀 البوت يعمل بنجاح مع Flask و Pyrogram!"
+app_aiohttp = web.Application()
+app_aiohttp.router.add_get("/", handle_home)
 
 # مجلد لحفظ الصور المصغرة
 thumbnail_folder = "thumbnails"
@@ -265,11 +264,22 @@ async def upload_with_progress(client, progress_message, file_path, caption, dur
     if os.path.exists(file_path):
         os.remove(file_path)
 
-# تشغيل الخوادم
-def run_flask():
-    app_flask.run(host="0.0.0.0", port=8080)
+async def main():
+    runner = web.AppRunner(app_aiohttp)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", 8080)
+    await site.start()
+    print("🚀 خادم aiohttp يعمل على http://0.0.0.0:8080")
+    
+    # تشغيل البوت
+    await app.start()
+    print("🚀 البوت يعمل بنجاح!")
+
+    try:
+        await asyncio.Event().wait()  # إبقاء التطبيق قيد التشغيل
+    finally:
+        await app.stop()
+        await runner.cleanup()
 
 if __name__ == "__main__":
-    threading.Thread(target=run_flask).start()
-    print("🚀 بدء تشغيل البوت وخادم Flask...")
-    app.run()
+    app.run(main())
