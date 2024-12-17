@@ -15,7 +15,7 @@ api_hash = "d169162c1bcf092a6773e685c62c3894"  # استبدل بـ API Hash ال
 bot_token = "7701589300:AAG-64FpYOaXkH1OnTXgD08Fk84j4A3dwp4"  # استبدل بـ توكن البوت الخاص بك
 
 # تشغيل البوت
-app = Client("dwnloadersss_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+app = Client("dwnloader_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 # إعداد aiohttp بديل لـ Flask
 async def handle_home(request):
@@ -69,7 +69,7 @@ async def start(client, message):
     if user_id in last_start_time:
         elapsed_time = current_time - last_start_time[user_id]
         if elapsed_time < 60:  # السماح بأمر /start مرة كل 60 ثانية
-            await message.reply_text("⚠️ لقد أرسلت أمر /start مؤخرًا. الرجاء الانتظار قليلًا.")
+            await message.reply_text("**⚠️ لقد أرسلت أمر /start مؤخرًا. الرجاء الانتظار قليلًا.**")
             return
 
     # تحديث وقت آخر أمر /start
@@ -78,8 +78,8 @@ async def start(client, message):
     # الرد على المستخدم
     user_states[user_id] = "idle"
     await message.reply_text(
-        "✨ **مرحبًا بك!**\n\n"
-        "أرسل رابط الفيديو الذي تريد تنزيله، أو استخدم الأزرار أدناه لتخصيص إعداداتك:",
+        "✨ **  مرحبًا بك! لقد تم التصميم بواسطة @YA_AE **\n\n"
+        "**أرسل رابط الفيديو الذي تريد تنزيله، أو استخدم الأزرار أدناه لتخصيص إعداداتك:**",
         reply_markup=InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("📱 User-Agent", callback_data="user_agent"),
@@ -100,28 +100,28 @@ async def handle_thumbnail(client, message):
     
     # تنزيل الصورة
     await message.download(file_name=thumbnail_path)
-    await message.reply_text("✅ تم حفظ الصورة المصغرة! سيتم استخدامها مع الفيديوهات القادمة.")
+    await message.reply_text("**✅ تم حفظ الصورة المصغرة! سيتم استخدامها مع الفيديوهات القادمة.**")
 
 # استقبال أوامر الأزرار
 @app.on_callback_query(filters.regex("user_agent"))
 async def set_user_agent(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_user_agent"
-    await callback_query.message.reply_text("🚀 أرسل الـ User-Agent الذي ترغب في استخدامه:")
+    await callback_query.message.reply_text("**🚀 أرسل الـ User-Agent الذي ترغب في استخدامه:**")
     await callback_query.answer()
 
 @app.on_callback_query(filters.regex("referer"))
 async def set_referer(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_referer"
-    await callback_query.message.reply_text("🔗 أرسل الـ Referer الذي ترغب في استخدامه:")
+    await callback_query.message.reply_text("**🔗 أرسل الـ Referer الذي ترغب في استخدامه:**")
     await callback_query.answer()
 
 @app.on_callback_query(filters.regex("set_video_name"))
 async def set_video_name(client, callback_query):
     user_id = callback_query.from_user.id
     user_states[user_id] = "setting_video_name"
-    await callback_query.message.reply_text("🎥 أرسل اسم الفيديو:")
+    await callback_query.message.reply_text("**🎥 أرسل اسم الفيديو:**")
     await callback_query.answer()
 
 @app.on_callback_query(filters.regex("clear_settings"))
@@ -132,7 +132,7 @@ async def clear_settings(client, callback_query):
     thumbnail_path = os.path.join(thumbnail_folder, f"{user_id}_thumbnail.jpg")
     if os.path.exists(thumbnail_path):
         os.remove(thumbnail_path)  # حذف الصورة المصغرة إذا كانت موجودة
-    await callback_query.message.reply_text("✅ تم مسح جميع الإعدادات!")
+    await callback_query.message.reply_text("**✅ تم مسح جميع الإعدادات!**")
     await callback_query.answer()
 
 # استقبال النصوص بناءً على حالة المستخدم
@@ -159,8 +159,23 @@ async def handle_text(client, message):
         await message.reply_text(f"✅ تم تحديد اسم الفيديو:\n{text}")
         user_states[user_id] = "idle"
 
-    elif state == "idle" and (text.startswith("http://") or text.startswith("https://")):
-        await process_video_download(client, message, text)
+    elif state == "idle":
+        # تقسيم النص إلى أسطر
+        urls = text.split("\n")
+        valid_urls = [url.strip() for url in urls if url.startswith(("http://", "https://"))]
+
+        if not valid_urls:
+            await message.reply_text("❌ لم يتم العثور على روابط صالحة في النص.")
+            return
+
+        total_videos = len(valid_urls)
+        await message.reply_text(f"🚀 **تم اكتشاف {total_videos} رابطًا. سيتم تنزيلها واحدًا تلو الآخر.**")
+
+        for idx, url in enumerate(valid_urls, start=1):
+            await message.reply_text(f"📥 **جاري تنزيل الفيديو {idx} من {total_videos}...**")
+            await process_video_download(client, message, url)
+
+        await message.reply_text("✅ **تم اكتمال تنزيل جميع الروابط!**")
 
 # دالة معالجة التنزيل
 async def process_video_download(client, message, url):
